@@ -24,3 +24,15 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+#html5-qrcode-button-camera-start {
+  background: #16a34a;
+  color: white;
+  border-color: #16a34a;
+}
+
+#html5-qrcode-button-camera-stop {
+  background: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
