@@ -36,3 +36,9 @@ body {
   color: white;
   border-color: #dc2626;
 }
+
+#html5-qrcode-button-camera-permission {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
