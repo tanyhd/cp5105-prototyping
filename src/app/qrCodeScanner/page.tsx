@@ -1,11 +1,11 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import QrScanner, { type ScanResult } from "./QrScanner";
+import QrScanner, { type ScanResult } from "../../common/QrScanner";
 
 type LogRow = ScanResult & { id: string };
 
-export default function Home() {
+export default function QrCodeScannerPage() {
   const [logs, setLogs] = useState<LogRow[]>([]);
   const [armed, setArmed] = useState(true);
   const [toastOpen, setToastOpen] = useState(false);
