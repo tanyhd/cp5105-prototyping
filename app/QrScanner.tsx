@@ -15,71 +15,57 @@ export type ScanResult = {
 
 type Props = {
   onScan: (result: ScanResult) => void;
-  scanToken: number;
+  armed: boolean; // when false, ignore scans
 };
 
-export default function QrScanner({onScan, scanToken}: Props) {
+export default function QrScanner({ onScan, armed }: Props) {
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
-  const didScanRef = useRef(false);
-  const seqRef = useRef(0);
+
+  const armedRef = useRef(armed);
+  useEffect(() => {
+    armedRef.current = armed;
+  }, [armed]);
+
+  const onScanRef = useRef(onScan);
+  useEffect(() => {
+    onScanRef.current = onScan;
+  }, [onScan]);
 
   const readerId = "reader";
 
-   const stopScanner = async () => {
-    const s = scannerRef.current;
-    if (!s) return;
-
-    try {
-      await s.clear();
-    } catch {
-      // ignore
-    } finally {
-      scannerRef.current = null;
-      const el = document.getElementById(readerId);
-      if (el) el.innerHTML = ""; // extra safety: remove leftover video DOM
-    }
-  };
-
   useEffect(() => {
-    const seq = ++seqRef.current;
-    let cancelled = false;
+    if (scannerRef.current) return;
 
-    (async () => {
-      await stopScanner();
-      if (cancelled || seq !== seqRef.current) return;
+    const scanner = new Html5QrcodeScanner(
+      readerId,
+      { fps: 10, qrbox: 250 },
+      false
+    );
 
-      didScanRef.current = false;
+    scannerRef.current = scanner;
 
-      const el = document.getElementById(readerId);
-      if (!el) return; // should not happen, but prevents crash
+    scanner.render(
+      (decodedText) => {
+        if (!armedRef.current) return;
 
-      const scanner = new Html5QrcodeScanner(readerId, { fps: 10, qrbox: 250 }, false);
-      scannerRef.current = scanner;
+        const parsed = parseScan(decodedText);
+        if (!parsed) return;
 
-      scanner.render(
-        async (decodedText) => {
-          if (didScanRef.current) return;
+        // disarm immediately to prevent double logs while camera still sees same QR
+        armedRef.current = false;
 
-          const parsed = parseScan(decodedText);
-          if (!parsed) return;
-
-          didScanRef.current = true;
-          onScan(parsed);
-
-          await stopScanner(); // stop after one valid scan
-        },
-        () => {
-          // ignore scan errors
-        }
-      );
-    })();
+        onScanRef.current(parsed);
+      },
+      () => {
+        // ignore errors
+      }
+    );
 
     return () => {
-      cancelled = true;
-      didScanRef.current = true;
-      stopScanner();
+      scanner.clear().catch(() => {});
+      scannerRef.current = null;
     };
-  }, [scanToken, onScan]);
+  }, []);
 
   return <div id={readerId} />;
 }

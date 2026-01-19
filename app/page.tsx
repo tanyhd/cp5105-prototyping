@@ -7,28 +7,66 @@ type LogRow = ScanResult & { id: string };
 
 export default function Home() {
   const [logs, setLogs] = useState<LogRow[]>([]);
-  const [scanToken, setScanToken] = useState(0);
+  const [armed, setArmed] = useState(true);
+  const [toastOpen, setToastOpen] = useState(false);
 
   const onScan = useCallback((result: ScanResult) => {
-    setLogs((prev) => [
-      { ...result, id: crypto.randomUUID() },
-      ...prev,
-    ]);
+    setLogs((prev) => [{ ...result, id: crypto.randomUUID() }, ...prev,]);
+    setArmed(false);
+    setToastOpen(true);
   }, []);
+
+  const armNext = () => {
+    setToastOpen(false);
+    setArmed(true);
+  };
 
   return (
     <main style={{ padding: 16 }}>
       <h1>QR Scanner</h1>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-        <button onClick={() => setScanToken((t) => t + 1)}>Scan next</button>
         <button onClick={() => setLogs([])} disabled={logs.length === 0}>
           Clear table
         </button>
       </div>
 
-      <QrScanner onScan={onScan} scanToken={scanToken} />
+     <QrScanner onScan={onScan} armed={armed} />
 
+     {/* Popup overlay (click anywhere on it to scan next) */}
+      {toastOpen && (
+        <div
+          onClick={armNext}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.35)",
+            display: "grid",
+            placeItems: "center",
+            zIndex: 9999,
+            cursor: "pointer",
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              color: "#111",
+              padding: "14px 16px",
+              borderRadius: 10,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+              minWidth: 260,
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Scanned ✅</div>
+            <div style={{ opacity: 0.8, fontSize: 14 }}>
+              Tap to scan next
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Table */}
       <div style={{ marginTop: 16, overflowX: "auto" }}>
         <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 600 }}>
           <thead>
