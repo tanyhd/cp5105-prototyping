@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     await tgSendMessage(
       chatId,
-      `Welcome! Please reply with your NUS student id to register for: ${eventId} (e.g. E1325999).`
+      `Welcome! Please reply with your NUS student id to register for: ${eventId} (e.g. E1234567).`
     );
 
     return NextResponse.json({ ok: true });
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     if (!isValidStudentId(studentId)) {
       await tgSendMessage(
         chatId,
-        "Invalid student id format. Example: E1325999. Please try again."
+        "Invalid student id format. Example: E1234567. Please try again."
       );
       return NextResponse.json({ ok: true });
     }

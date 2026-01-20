@@ -13,7 +13,7 @@ export default async function TelegramBotPage() {
     );
   }
 
-  const payload = "test_event_1"; // use different payloads for different events
+  const payload = "test_event_2"; // use different payloads for different events
   const url = `https://t.me/${botUsername}?start=${payload}`;
 
   const dataUrl = await QRCode.toDataURL(url, {
