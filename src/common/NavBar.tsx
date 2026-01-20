@@ -13,6 +13,7 @@ export default function NavBar() {
       <Link href="/">Home</Link>
       <Link href="/qrCodeScanner">QR Scanner</Link>
       <Link href="/telegramBot">Telegram Bot</Link>
+      <Link href="/studentCardReader">Student Card Reader</Link>
 
     </nav>
   );
