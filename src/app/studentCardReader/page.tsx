@@ -9,7 +9,9 @@ export default function NfcTestPage() {
     try {
       // @ts-ignore - TS may not know Web NFC types depending on your setup
       if (!("NDEFReader" in window)) {
-        setLog("Web NFC not supported on this browser/device. Try Chrome on Android.");
+        setLog(
+          "Web NFC not supported on this browser/device. Try Chrome on Android."
+        );
         return;
       }
 
@@ -21,23 +23,53 @@ export default function NfcTestPage() {
       setLog("Scan started. Tap an NFC tag/card to the phone.");
 
       // @ts-ignore
-      reader.onreading = (event: any) => {
-        const { message } = event;
+      reader.onreading = async (event: any) => {
         const lines: string[] = [];
 
-        for (const record of message.records) {
-          lines.push(`recordType=${record.recordType}, mediaType=${record.mediaType ?? ""}`);
+        lines.push("✅ NFC tag detected");
+        lines.push(`serialNumber: ${event.serialNumber ?? "(none)"}`);
 
-          // Common case: text record
-          if (record.recordType === "text") {
-            const text = new TextDecoder().decode(record.data);
-            lines.push(`text=${text}`);
+        const records = event.message?.records ?? [];
+        lines.push(`records: ${records.length}`);
+
+        // Helper to turn ArrayBuffer/DataView into hex
+        const toHex = (buf: ArrayBuffer | DataView) => {
+          const ab = buf instanceof DataView ? buf.buffer : buf;
+          const bytes = new Uint8Array(ab);
+          return [...bytes]
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join(" ");
+        };
+
+        for (let i = 0; i < records.length; i++) {
+          const r = records[i];
+          lines.push("");
+          lines.push(`--- record #${i + 1} ---`);
+          lines.push(`recordType: ${r.recordType}`);
+          lines.push(`mediaType: ${r.mediaType ?? "(none)"}`);
+          lines.push(`id: ${r.id ?? "(none)"}`);
+          lines.push(`encoding: ${r.encoding ?? "(none)"}`);
+          lines.push(`lang: ${r.lang ?? "(none)"}`);
+
+          try {
+            // Try decode via text()
+            if (typeof r.text === "function") {
+              const t = await r.text();
+              lines.push(`text(): ${t}`);
+            }
+          } catch (e: any) {
+            lines.push(`text() error: ${e?.message ?? String(e)}`);
           }
 
-          // Common case: url record
-          if (record.recordType === "url") {
-            const url = new TextDecoder().decode(record.data);
-            lines.push(`url=${url}`);
+          // Raw bytes (if available)
+          try {
+            if (r.data) {
+              lines.push(`data(hex): ${toHex(r.data)}`);
+            } else {
+              lines.push("data: (none)");
+            }
+          } catch (e: any) {
+            lines.push(`data read error: ${e?.message ?? String(e)}`);
           }
         }
 
