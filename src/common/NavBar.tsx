@@ -12,9 +12,8 @@ export default function NavBar() {
     >
       <Link href="/">Home</Link>
       <Link href="/qrCodeScanner">QR Scanner</Link>
+      <Link href="/telegramBot">Telegram Bot</Link>
 
-      {/* add more later */}
-      {/* <Link href="/test1">Test 1</Link> */}
     </nav>
   );
 }
