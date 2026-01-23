@@ -42,3 +42,57 @@ body {
   color: white;
   border-color: #2563eb;
 }
+
+/* Default button styling (works in dark + light) */
+button {
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Better keyboard focus */
+button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Disabled state */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Inputs / selects / textareas */
+input,
+select,
+textarea {
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font: inherit;
+}
+
+/* File input: browser renders it differently, but this helps */
+input[type="file"] {
+  padding: 6px;
+}
+
+/* Focus ring (keyboard friendly) */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Placeholder color */
+::placeholder {
+  opacity: 0.6;
+  color: currentColor;
+}
